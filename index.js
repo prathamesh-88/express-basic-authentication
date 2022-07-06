@@ -1,13 +1,22 @@
+var fs = require('fs');
 const express = require('express');
 const morgan = require('morgan');
-require('dotenv').config();
 const app = express();
-
+const {NODE_ENV, PORT, LOG_DESTINATION} = require('./constants/environment');
 const {add_user, login} = require('./controllers/authenticator');
+
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan('tiny'))
+if (NODE_ENV === 'development') {
+    app.use(morgan('dev'));
+}else{
+    // create a write stream (in append mode)
+    var accessLogStream = fs.createWriteStream(LOG_DESTINATION, { flags: 'a' });
+    // setup the logger
+    app.use(morgan('combined', { stream: accessLogStream }))
+}
 
 
 
@@ -40,8 +49,6 @@ app.post('/login', (req, res) => {
 })
 
 
-port = process.env.PORT || 3000;
-
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 })
