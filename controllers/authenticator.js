@@ -9,17 +9,19 @@ const {add_entry, find_one_entry} = require('./database.js');
 // Custom made utility function to verify user details
 const {verify_user_details} = require('../utility/verify.js')
 
+//Global constants
+const {SUCCESS, FAILED} = require('../constants/global.js');
 
 // Check if user already exists
 async function user_exist(email){
     let result = await find_one_entry('template', 'users', {email: email});
     // console.log('Inside user exists', result)
-    if (result.status === 'success'){
+    if (result.status === SUCCESS){
         return {
             status: true,
             result: result.result
         }
-    }else if (result.status === 'failed'){
+    }else if (result.status === FAILED){
         return {
             status: false,
             error: result.error
@@ -57,12 +59,12 @@ async function add_user(user){
 
     if (is_existing_user.status){
         results = {
-            status: 'failed',
+            status: FAILED,
             error: 'User already exists'
         }
     }else if (!is_existing_user['status'] && is_existing_user.error === 'Database error'){
         results = {
-            status: 'failed',
+            status: FAILED,
             error: 'Database error'
         }
     }else{
@@ -70,20 +72,20 @@ async function add_user(user){
         if (user_status.status){
             user = user_process(user)
             let result = await add_entry('template', 'users', user);
-            if (result.status === 'success'){
+            if (result.status === SUCCESS){
                 results = {
-                    status: 'success',
+                    status: SUCCESS,
                     _id: result._id
                 }
-            }else if (result.status === 'failed'){
+            }else if (result.status === FAILED){
                 results = {
-                    status: 'failed',
+                    status: FAILED,
                     error: result.error
                 }
             }
         }else{
             results = {
-                status: 'failed',
+                status: FAILED,
                 error: user_status.error
             }
         }    
@@ -95,45 +97,30 @@ async function add_user(user){
 // Controller for /login
 async function login(user){
     let results = {'Default': 'Default'};
-
-        try{
-            await client.connect();
-            const db = client.db('template');
-            const collection = db.collection('users');
-            const result = await collection.findOne({email: user.email});
-         
-            if (result){
-                const password = SHA256(result.password.salt + user.password).toString();
-                if (result.password.password === password){
-                    results = {
-                        status: 'success',
-                        _id: result._id,
-                    }
-                }else{
-                    results = {
-                        status: 'failed',
-                        error: 'Incorrect password'
-                    }
-                }
-            }else{
-                results = {
-                    status: 'failed',
-                    error: 'User does not exist'
-                }
-            }
-        }catch(err){
+    const query_result = await find_one_entry('template','users',{email: user.email});  
+    console.log('Inside login', query_result)
+    if (query_result.status === SUCCESS){
+        const password = SHA256(query_result.result.password.salt + user.password).toString();
+        if (query_result.result.password.password === password){
             results = {
-                status: 'failed',
-                error: {
-                    err, 
-                    message: 'Something went wrong'}
+                status: SUCCESS,
+                _id: query_result.result._id,
             }
-        }finally{
-            client.close();
+        }else{
+            results = {
+                status: FAILED,
+                error: 'Incorrect password'
+            }
         }
-
+    }else{
+        results = {
+            status: FAILED,
+            error: 'User does not exist'
+        }
+    }
     return results;
 }
+
 
 module.exports = {add_user, login};
     

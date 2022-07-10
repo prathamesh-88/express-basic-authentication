@@ -1,5 +1,5 @@
 const path  = require('path');
-const NODE_ENV = 'production'; //'development'; 
+const NODE_ENV =  'development'; //'production';
 const LOG_DESTINATION = path.join(__dirname, '../access.logs');
 
 if (NODE_ENV === 'development') {

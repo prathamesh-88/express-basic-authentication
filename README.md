@@ -1,6 +1,6 @@
 # Basic ExpressJS  Authentication System
 
-#### An ExpressJS API Gateway that takes care of the following:
+### An ExpressJS API Gateway that takes care of the following:
 
 - Accept User Information
 - Check User Information
@@ -8,12 +8,12 @@
 - Login user by verifying credentials
 - Return appropriate response
 
-#### Requirements
-- NodeJS >= 16.13.x
-- NPM >= 8.13.x
+### Requirements
+- NodeJS >= 16.13.x (Only for non-docker setup)
+- NPM >= 8.13.x (Only for non-docker setup)
 - MongoDB URI. [Click here](https://www.mongodb.com/docs/guides/atlas/connection-string/) for the instruction to setup a free online MongoDB Atlas account. You can use local MongoDB as well.
 
-#### Setup
+### Local Setup without docker
 1. Browse to the directory `basic-authentication-template` and open the `.env` file in any text editor. Make the following changes. Replace `<Paste your MongoDB URI>` with MongoDB URI 
 
 > MONGODB_URI=\<Paste your MongoDB URI here> 
@@ -26,7 +26,7 @@
 5. Now you have an ExpressJS application running at port 3000 by default unless you have specified any other port in the `.env` file.
 
 
-#### Endpoints
+### Endpoints
 
 **Default BaseURL on localhost**:`http://localhost:3000`
 

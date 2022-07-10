@@ -3,9 +3,13 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const {MONGODB_URI} = require('../constants/environment.js');
 const client = new MongoClient(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+//Global constants
+const {SUCCESS, FAILED} = require('../constants/global.js');
+
+
 async function add_entry(target_db, target_collection, entry){
     let query_result = {
-                status: 'failed',
+                status: FAILED,
                 error: 'Cannot process, try again later'
             };
     try{
@@ -14,12 +18,12 @@ async function add_entry(target_db, target_collection, entry){
         const collection = db.collection(target_collection);
         const result = await collection.insertOne(entry);
         query_result = {
-            status: 'success',
+            status: SUCCESS,
             _id: result.insertedId,
         }
     }catch(err){
         query_result = {
-            status: 'failed',
+            status: FAILED,
             error: 'Database error',
             details: err
         }
@@ -57,7 +61,8 @@ async function find_one_entry(target_db, target_collection, parameters){
     }catch(err){
         query_result = {
             status: 'failed',
-            error: err
+            error: 'Database error',
+            details: err
         }
     }finally{
         client.close();
